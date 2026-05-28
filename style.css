@@ -166,6 +166,8 @@ font-size: clamp(2.5rem, 6vw, 5rem);
 font-weight: normal;
 margin: 0;
 line-height: 1;
+text-transform: uppercase;
+letter-spacing: 0.05em;
 }
 .site-title a {
 color: var(--ft-bg-dark);
@@ -403,13 +405,19 @@ margin-top: var(--sp-lg);
    ========================================================================== */
 .narrow-constraint { max-width: 600px; margin: 0 auto; }
 
-/* Breadcrumb navigation */
-.lwai-breadcrumb { font-size: 0.8rem; font-family: var(--ff-ui); margin-bottom: 1rem; }
-.lwai-breadcrumb ol { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; color: rgba(255,255,255,0.5); }
+/* Breadcrumb navigation — dark text by default (white/light backgrounds) */
+.lwai-breadcrumb { font-size: 0.8rem; font-family: var(--ff-ui); margin-bottom: 1rem; padding: 0.5rem 0; }
+.lwai-breadcrumb ol { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; color: var(--ft-text-secondary); }
 .lwai-breadcrumb li { display: flex; align-items: center; gap: 4px; }
-.lwai-breadcrumb a { color: rgba(255,255,255,0.7); text-decoration: none; }
-.lwai-breadcrumb a:hover { color: #fff; text-decoration: underline; }
-.lwai-breadcrumb-sep { color: rgba(255,255,255,0.3); }
+.lwai-breadcrumb a { color: var(--ft-text-body); text-decoration: none; }
+.lwai-breadcrumb a:hover { text-decoration: underline; }
+.lwai-breadcrumb-sep { opacity: 0.4; }
+
+/* Override to white inside the dark article hero */
+.article-hero-text .lwai-breadcrumb ol { color: rgba(255,255,255,0.55); }
+.article-hero-text .lwai-breadcrumb a { color: rgba(255,255,255,0.75); }
+.article-hero-text .lwai-breadcrumb a:hover { color: #fff; }
+.article-hero-text .lwai-breadcrumb-sep { color: rgba(255,255,255,0.35); }
 
 /* Article hero header */
 .article-hero-header {

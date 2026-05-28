@@ -384,6 +384,24 @@ add_action( 'wp_loaded', function () {
 } );
 
 /**
+ * Fix: Redirect attachment pages to their parent post.
+ * Prevents WordPress from resolving /%category%/%postname%/ URLs as
+ * attachment/image pages instead of the actual post.
+ */
+add_action( 'template_redirect', function () {
+	if ( ! is_attachment() ) {
+		return;
+	}
+	$parent_id = wp_get_post_parent_id( get_the_ID() );
+	if ( $parent_id ) {
+		wp_redirect( get_permalink( $parent_id ), 301 );
+	} else {
+		wp_redirect( home_url( '/' ), 301 );
+	}
+	exit;
+} );
+
+/**
  * M-4: Noindex search result pages — they are thin/duplicate content.
  */
 add_action( 'wp_head', function () {

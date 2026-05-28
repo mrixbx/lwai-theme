@@ -13,7 +13,7 @@ get_header();
 		<!-- ═══════════════════════════════════════════════════════════════
 		     TOP HERO GRID  (WSJ Inspired Layout)
 		     ═══════════════════════════════════════════════════════════════ -->
-		<div class="row pt-3 pb-4 mb-4 border-bottom border-dark border-2">
+		<div class="row pt-3 pb-4 mb-4">
 
 			<!-- LEFT/CENTER WRAPPER (Lead + Secondary) -->
 			<div class="col-lg-9 pe-lg-4 border-end-lg">

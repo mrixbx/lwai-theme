@@ -18,13 +18,13 @@ get_header();
 			the_post();
 			?>
 
-			<?php lwai_breadcrumb(); ?>
-
-			<article id="post-<?php the_ID(); ?>" <?php post_class( 'nyt-article' ); ?>>
+				<article id="post-<?php the_ID(); ?>" <?php post_class( 'nyt-article' ); ?>>
 
 				<!-- ── ARTICLE HERO HEADER ── -->
 				<div class="article-hero-header">
 					<div class="article-hero-text narrow-constraint">
+
+						<?php lwai_breadcrumb(); ?>
 
 						<!-- Category kicker -->
 						<?php
