@@ -68,7 +68,7 @@ background-color: var(--ft-bg-main);
 img { max-width: 100%; height: auto; display: block; }
 
 a { color: var(--ft-teal); text-decoration: none; }
-a:hover { color: currentColor; text-decoration: underline; text-underline-offset: 3px; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 /* ==========================================================================
    2. Typography
@@ -356,7 +356,6 @@ transition: text-decoration-color 0.2s ease;
 text-decoration-color: transparent !important;
 }
 .hover-primary:hover {
-color: inherit !important;
 text-decoration: underline !important;
 text-underline-offset: 4px;
 }
