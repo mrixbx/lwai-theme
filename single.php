@@ -18,6 +18,8 @@ get_header();
 			the_post();
 			?>
 
+			<?php lwai_breadcrumb(); ?>
+
 			<article id="post-<?php the_ID(); ?>" <?php post_class( 'nyt-article' ); ?>>
 
 				<!-- ── ARTICLE HERO HEADER ── -->
@@ -56,15 +58,19 @@ get_header();
 
 					<!-- Hero image (full-width below text) -->
 					<?php if ( has_post_thumbnail() ) : ?>
-						<div class="article-hero-image">
-							<?php the_post_thumbnail( 'hero', array( 'class' => 'hero-img img-fluid mx-auto d-block', 'loading' => 'eager' ) ); ?>
+						<figure class="article-hero-image">
+							<?php the_post_thumbnail( 'hero', array(
+								'class'   => 'hero-img img-fluid mx-auto d-block',
+								'loading' => 'eager',
+								'alt'     => the_title_attribute( array( 'echo' => false ) ),
+							) ); ?>
 							<?php
 							$caption = wp_get_attachment_caption( get_post_thumbnail_id() );
 							if ( $caption ) :
 								echo '<figcaption class="media-caption">' . esc_html( $caption ) . '</figcaption>';
 							endif;
 							?>
-						</div>
+						</figure>
 					<?php endif; ?>
 
 				</div><!-- .article-hero-header -->
@@ -80,6 +86,11 @@ get_header();
 						<time class="article-date" datetime="<?php echo esc_attr( get_the_date( 'c' ) ); ?>">
 							Published <?php echo esc_html( get_the_date( 'M. j, Y' ) ); ?>
 						</time>
+						<?php if ( get_the_modified_date( 'c' ) !== get_the_date( 'c' ) ) : ?>
+						<time class="article-modified-date" datetime="<?php echo esc_attr( get_the_modified_date( 'c' ) ); ?>">
+							Updated <?php echo esc_html( get_the_modified_date( 'M. j, Y' ) ); ?>
+						</time>
+						<?php endif; ?>
 					</div>
 
 					<!-- Article content -->

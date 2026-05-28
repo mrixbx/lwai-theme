@@ -54,7 +54,7 @@ get_header();
 									<?php if ( has_post_thumbnail() ) : ?>
 										<div class="col-md-6 order-1 order-md-2">
 											<a href="<?php echo esc_url( get_permalink() ); ?>" class="d-block">
-												<?php the_post_thumbnail( 'large', array( 'class' => 'img-fluid w-100 object-fit-cover', 'loading' => 'eager' ) ); ?>
+												<?php the_post_thumbnail( 'large', array( 'class' => 'img-fluid w-100 object-fit-cover', 'loading' => 'eager', 'alt' => the_title_attribute( array( 'echo' => false ) ) ) ); ?>
 											</a>
 										</div>
 									<?php endif; ?>

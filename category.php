@@ -10,6 +10,8 @@ get_header();
 
 	<main id="primary" class="site-main py-4">
 
+		<?php lwai_breadcrumb(); ?>
+
 		<!-- Category Header -->
 		<header class="page-header mb-5 border-top border-bottom border-dark border-2 py-3 text-center">
 			<?php
@@ -51,7 +53,7 @@ get_header();
 									<?php if ( has_post_thumbnail() ) : ?>
 										<div class="col-md-6 order-1 order-md-2">
 											<a href="<?php echo esc_url( get_permalink() ); ?>" class="d-block">
-												<?php the_post_thumbnail( 'large', array( 'class' => 'img-fluid w-100 object-fit-cover', 'loading' => 'eager' ) ); ?>
+												<?php the_post_thumbnail( 'large', array( 'class' => 'img-fluid w-100 object-fit-cover', 'loading' => 'eager', 'alt' => the_title_attribute( array( 'echo' => false ) ) ) ); ?>
 											</a>
 										</div>
 									<?php endif; ?>

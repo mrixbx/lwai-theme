@@ -169,7 +169,7 @@ get_header();
 			if ( empty( $section_posts ) ) { continue; }
 			?>
 			<section class="border-top border-dark border-3 pt-3 mb-5">
-				<h3 class="h6 fw-bold text-uppercase border-bottom pb-2 mb-4" style="font-family: var(--ff-ui); letter-spacing: 1px;"><?php echo esc_html( $section_title ); ?></h3>
+				<h2 class="h6 fw-bold text-uppercase border-bottom pb-2 mb-4" style="font-family: var(--ff-ui); letter-spacing: 1px;"><?php echo esc_html( $section_title ); ?></h2>
 
 				<div class="row">
 
@@ -184,7 +184,7 @@ get_header();
 							<article class="row mb-4 align-items-start">
 								<div class="col-md-7 order-2 order-md-1 mt-3 mt-md-0">
 									<?php if ( $pcats ) { echo '<a href="' . esc_url( get_category_link( $pcats[0]->term_id ) ) . '" class="text-danger fw-bold small text-uppercase text-decoration-none mb-2 d-block" style="font-family: var(--ff-ui); font-size: 11px;">' . esc_html( $pcats[0]->name ) . '</a>'; } ?>
-									<h2 class="display-6 fw-bold mb-3" style="font-family: var(--ff-heading); line-height: 1.1;"><a href="<?php echo esc_url( get_permalink() ); ?>" class="text-dark text-decoration-none hover-primary"><?php the_title(); ?></a></h2>
+									<h3 class="display-6 fw-bold mb-3" style="font-family: var(--ff-heading); line-height: 1.1;"><a href="<?php echo esc_url( get_permalink() ); ?>" class="text-dark text-decoration-none hover-primary"><?php the_title(); ?></a></h3>
 									<div class="fs-5 text-secondary mb-3" style="font-family: var(--ff-body); line-height: 1.5;"><?php echo wp_trim_words( get_the_excerpt(), 30, '...' ); ?></div>
 									<span class="small text-muted" style="font-family: var(--ff-ui); font-size: 11px;">By <?php the_author(); ?></span>
 								</div>
@@ -255,7 +255,7 @@ get_header();
 										<?php the_post_thumbnail( 'card-thumb', array( 'class' => 'img-fluid w-100 object-fit-cover', 'loading' => 'lazy' ) ); ?>
 									</a>
 								<?php endif; ?>
-								<h2 class="h3 fw-bold mb-2" style="font-family: var(--ff-heading); line-height: 1.15;"><a href="<?php echo esc_url( get_permalink() ); ?>" class="text-dark text-decoration-none hover-primary"><?php the_title(); ?></a></h2>
+								<h3 class="h3 fw-bold mb-2" style="font-family: var(--ff-heading); line-height: 1.15;"><a href="<?php echo esc_url( get_permalink() ); ?>" class="text-dark text-decoration-none hover-primary"><?php the_title(); ?></a></h3>
 								<div class="text-secondary mb-2 lh-sm" style="font-family: var(--ff-body);"><?php echo wp_trim_words( get_the_excerpt(), 15, '...' ); ?></div>
 								<span class="small text-muted" style="font-family: var(--ff-ui); font-size: 11px;">By <?php the_author(); ?></span>
 							</article>

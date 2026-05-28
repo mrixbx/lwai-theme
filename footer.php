@@ -47,7 +47,7 @@
 			echo wp_kses_post( $footer_text );
 			?>
 		</span>
-		<a class="small footer-back-top fw-bold text-uppercase text-decoration-none" style="letter-spacing: 0.05em;" href="#">Back to top &uarr;</a>
+		<a class="small footer-back-top fw-bold text-uppercase text-decoration-none" style="letter-spacing: 0.05em;" href="#page">Back to top &uarr;</a>
 	</div>
 
 	<!-- Floating back-to-top button -->

@@ -141,8 +141,8 @@ function lwai_add_toc_to_content( $content ) {
     $toc_items = array();
     $counter = 1;
 
-    // Find H1, H2, H3 tags and add an ID attribute
-    $content = preg_replace_callback( '/<h([1-3])([^>]*)>(.*?)<\/h\1>/s', function( $matches ) use ( &$toc_items, &$counter ) {
+    // Find H2, H3 tags and add an ID attribute (H1 is the article title — skip it)
+    $content = preg_replace_callback( '/<h([2-3])([^>]*)>(.*?)<\/h\1>/s', function( $matches ) use ( &$toc_items, &$counter ) {
         $level = intval( $matches[1] );
         $title_html = $matches[3];
         $title_text = strip_tags( $title_html );
@@ -170,7 +170,7 @@ function lwai_add_toc_to_content( $content ) {
     // Build the TOC HTML
     $toc = '<nav class="article-toc mb-5" style="border: 1px solid var(--ft-border); background-color: var(--ft-bg-card); font-family: var(--ff-ui);">';
     $toc .= '<div class="d-flex justify-content-between align-items-center p-3" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#tocCollapse" aria-expanded="true" aria-controls="tocCollapse">';
-    $toc .= '<h4 class="mb-0 fw-bold" style="font-family: var(--ff-heading); letter-spacing: 0.5px; color: var(--ft-text-headline);">Content</h4>';
+    $toc .= '<p class="mb-0 fw-bold" style="font-family: var(--ff-heading); letter-spacing: 0.5px; color: var(--ft-text-headline); font-size: 1.1rem;">Contents</p>';
     $toc .= '<span style="color: var(--ft-text-headline);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg></span>';
     $toc .= '</div>';
     
@@ -382,3 +382,135 @@ add_action( 'wp_loaded', function () {
 		update_option( 'lwai2_permalink_v1', '1' );
 	}
 } );
+
+/**
+ * M-4: Noindex search result pages — they are thin/duplicate content.
+ */
+add_action( 'wp_head', function () {
+	if ( is_search() ) {
+		echo '<meta name="robots" content="noindex, follow">' . "\n";
+	}
+} );
+
+/**
+ * C-7: Exclude attachment pages from the core XML sitemap.
+ * Attachment pages are thin-content and should not be indexed.
+ */
+add_filter( 'wp_sitemaps_post_types', function ( $post_types ) {
+	unset( $post_types['attachment'] );
+	return $post_types;
+} );
+
+/**
+ * C-7: robots.txt additions — block search results and attachments.
+ */
+add_filter( 'robots_txt', function ( $output, $public ) {
+	$output .= "\nDisallow: /?s=\nDisallow: /attachment/\n";
+	return $output;
+}, 10, 2 );
+
+/**
+ * C-1: Output JSON-LD structured data via wp_head.
+ * - WebSite (front page only, enables Sitelinks Searchbox)
+ * - NewsArticle (single posts)
+ * - Organization (publisher block, reused in NewsArticle)
+ */
+function lwai_output_schema() {
+	$logo_id  = get_theme_mod( 'custom_logo' );
+	$logo_url = $logo_id ? wp_get_attachment_url( $logo_id ) : '';
+
+	$org = array(
+		'@type' => 'Organization',
+		'name'  => get_bloginfo( 'name' ),
+		'url'   => home_url( '/' ),
+	);
+	if ( $logo_url ) {
+		$org['logo'] = array( '@type' => 'ImageObject', 'url' => $logo_url );
+	}
+
+	if ( is_front_page() ) {
+		$schema = array(
+			'@context'        => 'https://schema.org',
+			'@type'           => 'WebSite',
+			'name'            => get_bloginfo( 'name' ),
+			'url'             => home_url( '/' ),
+			'potentialAction' => array(
+				'@type'       => 'SearchAction',
+				'target'      => array(
+					'@type'       => 'EntryPoint',
+					'urlTemplate' => home_url( '/?s={search_term_string}' ),
+				),
+				'query-input' => 'required name=search_term_string',
+			),
+		);
+		echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>' . "\n";
+	}
+
+	if ( is_single() ) {
+		$img_src = '';
+		if ( has_post_thumbnail() ) {
+			$_img = wp_get_attachment_image_src( get_post_thumbnail_id(), 'hero' );
+			if ( $_img ) { $img_src = $_img[0]; }
+		}
+
+		$schema = array(
+			'@context'      => 'https://schema.org',
+			'@type'         => 'NewsArticle',
+			'headline'      => get_the_title(),
+			'datePublished' => get_the_date( 'c' ),
+			'dateModified'  => get_the_modified_date( 'c' ),
+			'url'           => get_permalink(),
+			'author'        => array( '@type' => 'Person', 'name' => get_the_author() ),
+			'publisher'     => $org,
+		);
+		if ( $img_src ) {
+			$schema['image'] = array( '@type' => 'ImageObject', 'url' => $img_src, 'width' => 1200, 'height' => 675 );
+		}
+		echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>' . "\n";
+	}
+}
+add_action( 'wp_head', 'lwai_output_schema' );
+
+/**
+ * H-1: Breadcrumb navigation helper.
+ * Outputs semantic <nav> with BreadcrumbList microdata (schema.org).
+ * Call lwai_breadcrumb() at the top of single.php and category.php.
+ */
+function lwai_breadcrumb() {
+	if ( is_front_page() ) {
+		return;
+	}
+
+	$crumbs = array(
+		array( 'url' => home_url( '/' ), 'name' => get_bloginfo( 'name' ) ),
+	);
+
+	if ( is_singular() ) {
+		$cats = get_the_category();
+		if ( $cats ) {
+			$crumbs[] = array( 'url' => get_category_link( $cats[0]->term_id ), 'name' => $cats[0]->name );
+		}
+		$crumbs[] = array( 'url' => '', 'name' => get_the_title() );
+	} elseif ( is_category() ) {
+		$crumbs[] = array( 'url' => '', 'name' => single_cat_title( '', false ) );
+	} elseif ( is_author() ) {
+		$crumbs[] = array( 'url' => '', 'name' => get_the_author_meta( 'display_name', get_queried_object_id() ) );
+	}
+
+	echo '<nav class="lwai-breadcrumb" aria-label="' . esc_attr__( 'Breadcrumb', 'lwai' ) . '">';
+	echo '<ol itemscope itemtype="https://schema.org/BreadcrumbList">';
+	$total = count( $crumbs );
+	foreach ( $crumbs as $i => $crumb ) {
+		$is_last = ( $i === $total - 1 );
+		echo '<li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">';
+		if ( ! $is_last && $crumb['url'] ) {
+			echo '<a itemprop="item" href="' . esc_url( $crumb['url'] ) . '"><span itemprop="name">' . esc_html( $crumb['name'] ) . '</span></a>';
+			echo '<span class="lwai-breadcrumb-sep" aria-hidden="true">&rsaquo;</span>';
+		} else {
+			echo '<span itemprop="name">' . esc_html( $crumb['name'] ) . '</span>';
+		}
+		echo '<meta itemprop="position" content="' . ( $i + 1 ) . '">';
+		echo '</li>';
+	}
+	echo '</ol></nav>';
+}

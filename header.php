@@ -16,34 +16,58 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
 	<?php
-	/* ── Open Graph & Twitter Card ── */
-	if ( is_singular() ) :
-		$og_title = get_the_title();
-		$og_desc  = has_excerpt() ? get_the_excerpt() : wp_trim_words( get_the_content(), 30 );
-		$og_desc  = substr( wp_strip_all_tags( $og_desc ), 0, 160 );
-		$og_url   = get_permalink();
-		$og_image = '';
+	/* ── SEO: Description, Canonical, Open Graph, Twitter Card ── */
+	$seo_image = '';
+	if ( is_singular() ) {
+		$seo_title = get_the_title();
+		$seo_desc  = has_excerpt() ? get_the_excerpt() : wp_trim_words( get_the_content(), 30 );
+		$seo_url   = get_permalink();
+		$og_type   = is_page() ? 'website' : 'article';
 		if ( has_post_thumbnail() ) {
-			$img = wp_get_attachment_image_src( get_post_thumbnail_id(), 'hero' );
-			if ( $img ) { $og_image = $img[0]; }
+			$_img = wp_get_attachment_image_src( get_post_thumbnail_id(), 'hero' );
+			if ( $_img ) { $seo_image = $_img[0]; }
 		}
+	} elseif ( is_category() ) {
+		$seo_title = single_cat_title( '', false ) . ' | ' . get_bloginfo( 'name' );
+		$seo_desc  = category_description() ?: get_bloginfo( 'description' );
+		$seo_url   = get_pagenum_link( max( 1, (int) get_query_var( 'paged' ) ) );
+		$og_type   = 'website';
+	} elseif ( is_author() ) {
+		$seo_title = get_the_author_meta( 'display_name', get_queried_object_id() ) . ' | ' . get_bloginfo( 'name' );
+		$seo_desc  = get_the_author_meta( 'description', get_queried_object_id() ) ?: get_bloginfo( 'description' );
+		$seo_url   = get_author_posts_url( get_queried_object_id() );
+		$og_type   = 'website';
+	} else {
+		$seo_title = get_bloginfo( 'name' );
+		$seo_desc  = get_bloginfo( 'description' );
+		$seo_url   = is_front_page() ? home_url( '/' ) : get_pagenum_link( max( 1, (int) get_query_var( 'paged' ) ) );
+		$og_type   = 'website';
+	}
+	$seo_desc = substr( wp_strip_all_tags( $seo_desc ), 0, 155 );
 	?>
-	<meta property="og:type"        content="article">
-	<meta property="og:title"       content="<?php echo esc_attr( $og_title ); ?>">
-	<meta property="og:description" content="<?php echo esc_attr( $og_desc ); ?>">
-	<meta property="og:url"         content="<?php echo esc_url( $og_url ); ?>">
-	<?php if ( $og_image ) : ?>
-	<meta property="og:image"       content="<?php echo esc_url( $og_image ); ?>">
-	<meta name="twitter:image"      content="<?php echo esc_url( $og_image ); ?>">
+	<?php if ( $seo_desc ) : ?>
+	<meta name="description" content="<?php echo esc_attr( $seo_desc ); ?>">
 	<?php endif; ?>
+	<link rel="canonical" href="<?php echo esc_url( $seo_url ); ?>">
+
+	<!-- Open Graph -->
+	<meta property="og:site_name"   content="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
+	<meta property="og:type"        content="<?php echo esc_attr( $og_type ); ?>">
+	<meta property="og:title"       content="<?php echo esc_attr( $seo_title ); ?>">
+	<meta property="og:description" content="<?php echo esc_attr( $seo_desc ); ?>">
+	<meta property="og:url"         content="<?php echo esc_url( $seo_url ); ?>">
+	<?php if ( $seo_image ) : ?>
+	<meta property="og:image"        content="<?php echo esc_url( $seo_image ); ?>">
+	<meta property="og:image:width"  content="1200">
+	<meta property="og:image:height" content="675">
+	<?php endif; ?>
+
+	<!-- Twitter Card -->
 	<meta name="twitter:card"        content="summary_large_image">
-	<meta name="twitter:title"       content="<?php echo esc_attr( $og_title ); ?>">
-	<meta name="twitter:description" content="<?php echo esc_attr( $og_desc ); ?>">
-	<?php else : ?>
-	<meta property="og:type"        content="website">
-	<meta property="og:title"       content="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
-	<meta property="og:description" content="<?php echo esc_attr( get_bloginfo( 'description' ) ); ?>">
-	<meta property="og:url"         content="<?php echo esc_url( home_url( '/' ) ); ?>">
+	<meta name="twitter:title"       content="<?php echo esc_attr( $seo_title ); ?>">
+	<meta name="twitter:description" content="<?php echo esc_attr( $seo_desc ); ?>">
+	<?php if ( $seo_image ) : ?>
+	<meta name="twitter:image"       content="<?php echo esc_url( $seo_image ); ?>">
 	<?php endif; ?>
 
 	<?php wp_head(); ?>
@@ -98,7 +122,11 @@
 				the_custom_logo();
 			else :
 				?>
+				<?php if ( is_front_page() ) : ?>
 				<h1 class="site-title display-3 fw-normal mb-0" style="font-family: var(--ff-branding); line-height: 1;"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home" class="text-decoration-none"><?php bloginfo( 'name' ); ?></a></h1>
+				<?php else : ?>
+				<p class="site-title display-3 fw-normal mb-0" style="font-family: var(--ff-branding); line-height: 1;"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home" class="text-decoration-none"><?php bloginfo( 'name' ); ?></a></p>
+				<?php endif; ?>
 				<?php
 			endif;
 			?>
