@@ -68,7 +68,7 @@ background-color: var(--ft-bg-main);
 img { max-width: 100%; height: auto; display: block; }
 
 a { color: var(--ft-teal); text-decoration: none; }
-a:hover { color: var(--ft-teal-hover); text-decoration: underline; }
+a:hover { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
 
 /* ==========================================================================
    2. Typography
@@ -244,8 +244,8 @@ margin-bottom: 6px;
 text-decoration: none;
 }
 .kicker:hover, .cat-label:hover, .category-label:hover {
-color: var(--ft-teal);
 text-decoration: underline;
+text-underline-offset: 3px;
 }
 
 /* ==========================================================================
@@ -340,10 +340,8 @@ border-bottom: 1px solid var(--ft-border);
 transition: color 0.25s ease-in-out, text-decoration-color 0.25s ease-in-out; 
 text-decoration-color: transparent !important;
 }
-.hover-primary:hover { 
-color: var(--ft-teal) !important; 
-text-decoration: underline !important; 
-text-decoration-color: var(--ft-teal) !important;
+.hover-primary:hover {
+text-decoration: underline !important;
 text-underline-offset: 4px;
 }
 
@@ -639,11 +637,11 @@ color: var(--ft-text-inverse) !important;
 color: rgba(255, 255, 255, 0.7);
 transition: color 0.2s ease;
 }
-.footer-back-top:hover { color: var(--ft-text-inverse); }
+.footer-back-top:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 .footer-nav-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 24px; list-style: none; margin: 0; padding: 0; text-align: left; }
 .footer-nav-menu a { font-size: 13px; color: rgba(255, 255, 255, 0.75); text-transform: uppercase; letter-spacing: 0.05em; text-decoration: none; transition: color 0.2s ease; }
-.footer-nav-menu a:hover { color: var(--ft-text-inverse); text-decoration: underline; text-underline-offset: 3px; }
+.footer-nav-menu a:hover { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
 
 #back-to-top {
 background-color: rgba(255, 255, 255, 0.15);

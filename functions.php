@@ -344,6 +344,41 @@ function lwai_flush_category_rewrites() {
 	lwai_register_category_rewrites();
 	flush_rewrite_rules();
 }
-add_action( 'after_switch_theme', 'lwai_flush_category_rewrites' );
-add_action( 'created_category',   'lwai_flush_category_rewrites' );
-add_action( 'edited_category',    'lwai_flush_category_rewrites' );
+add_action( 'created_category', 'lwai_flush_category_rewrites' );
+add_action( 'edited_category',  'lwai_flush_category_rewrites' );
+
+/**
+ * On theme activation: set permalink structure to /%category%/%postname%/
+ * so article URLs become /ai-tech/article-slug/ instead of /article-slug/
+ */
+add_action( 'after_switch_theme', function () {
+	update_option( 'permalink_structure', '/%category%/%postname%/' );
+	lwai_register_category_rewrites();
+	flush_rewrite_rules();
+} );
+
+/**
+ * Set permalink structure to /%category%/%postname%/
+ * so article URLs read as /ai-tech/article-slug/ instead of /article-slug/
+ *
+ * Uses a versioned option so this runs once automatically even on an
+ * already-active theme — no need to deactivate/reactivate.
+ */
+function lwai_set_permalink_structure() {
+	if ( get_option( 'permalink_structure' ) !== '/%category%/%postname%/' ) {
+		update_option( 'permalink_structure', '/%category%/%postname%/' );
+		flush_rewrite_rules();
+	}
+}
+
+add_action( 'after_switch_theme', 'lwai_set_permalink_structure' );
+
+// One-time trigger for themes that are already active
+add_action( 'wp_loaded', function () {
+	if ( ! get_option( 'lwai2_permalink_v1' ) ) {
+		lwai_set_permalink_structure();
+		lwai_register_category_rewrites();
+		flush_rewrite_rules();
+		update_option( 'lwai2_permalink_v1', '1' );
+	}
+} );
