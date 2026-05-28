@@ -1,12 +1,12 @@
 /*
-Theme Name: LWAI
+Theme Name: LWAI2
 Theme URI: https://latestwithai.com/
 Author: LWAI Team
 Description: A lightweight, New York Times-inspired WordPress theme for AI journalism.
-Version: 1.1.0
+Version: 1.2.0
 License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Text Domain: lwai
+Text Domain: lwai2
 Tags: blog, news, custom-logo, translation-ready
 */
 
@@ -184,13 +184,19 @@ text-decoration: none !important;
 
 /* ── Navigation ── */
 
+#sticky-nav-wrapper {
+background-color: var(--ft-bg-dark);
+border-top: 1px solid rgba(255, 255, 255, 0.08);
+border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 #site-navigation a {
 font-size: 13px;
 text-transform: uppercase;
 letter-spacing: 0.08em;
 font-family: var(--ff-ui);
 font-weight: 700;
-color: var(--ft-bg-dark);
+color: var(--ft-text-inverse);
 text-decoration: none;
 transition: color 0.2s ease, background-color 0.2s ease;
 padding: 5px 10px;
@@ -198,7 +204,7 @@ border-radius: 3px;
 display: inline-block;
 }
 #site-navigation a:hover {
-background-color: var(--ft-bg-dark);
+background-color: rgba(255, 255, 255, 0.12);
 color: var(--ft-text-inverse) !important;
 text-decoration: none;
 }
@@ -218,7 +224,7 @@ cursor: pointer;
 padding: 8px;
 min-height: 44px;
 min-width: 44px;
-color: var(--ft-text-headline);
+color: var(--ft-text-inverse);
 }
 
 /* ==========================================================================
@@ -650,8 +656,8 @@ top: 0;
 left: 0;
 right: 0;
 height: 48px;
-background: var(--ft-bg-white);
-border-bottom: 1px solid var(--ft-border);
+background: var(--ft-bg-dark);
+border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 z-index: 1000;
 display: flex;
 align-items: center;
@@ -662,7 +668,7 @@ padding: 0 16px;
 font-family: var(--ff-branding);
 font-size: 20px;
 font-weight: 700;
-color: var(--ft-text-headline);
+color: var(--ft-text-inverse);
 text-decoration: none;
 }
 .mobile-menu-toggle,

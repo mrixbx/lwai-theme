@@ -320,15 +320,30 @@ add_filter( 'get_avatar_data', 'lwai_custom_avatar_url', 10, 2 );
 
 /**
  * Remove /category/ prefix from category URLs.
- * After activating this, go to Settings > Permalinks and click Save to flush rewrite rules.
+ *
+ * Strategy: filter generated links to strip /category/, then register a specific
+ * rewrite rule for every known category slug so WordPress can resolve them.
+ * Flush runs on theme activation and whenever a category is created or updated.
  */
-add_action( 'init', function () {
-	global $wp_rewrite;
-	$wp_rewrite->category_base = '';
-} );
-
-add_filter( 'category_link', function ( $link ) {
+function lwai_remove_category_base( $link ) {
 	return preg_replace( '|/category/|', '/', $link, 1 );
-} );
+}
+add_filter( 'category_link', 'lwai_remove_category_base' );
 
-add_action( 'after_switch_theme', 'flush_rewrite_rules' );
+function lwai_register_category_rewrites() {
+	$categories = get_categories( array( 'hide_empty' => false, 'number' => 200 ) );
+	foreach ( $categories as $cat ) {
+		$slug = preg_quote( $cat->slug, '/' );
+		add_rewrite_rule( '^' . $slug . '/page/([0-9]+)/?$', 'index.php?category_name=' . $cat->slug . '&paged=$matches[1]', 'top' );
+		add_rewrite_rule( '^' . $slug . '/?$',               'index.php?category_name=' . $cat->slug, 'top' );
+	}
+}
+add_action( 'init', 'lwai_register_category_rewrites' );
+
+function lwai_flush_category_rewrites() {
+	lwai_register_category_rewrites();
+	flush_rewrite_rules();
+}
+add_action( 'after_switch_theme', 'lwai_flush_category_rewrites' );
+add_action( 'created_category',   'lwai_flush_category_rewrites' );
+add_action( 'edited_category',    'lwai_flush_category_rewrites' );

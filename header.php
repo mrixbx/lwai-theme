@@ -105,11 +105,11 @@
 		</div><!-- .site-branding -->
 
 		<!-- Primary navigation -->
-		<div id="sticky-nav-wrapper" class="sticky-top bg-white border-top border-bottom py-2 transition-all">
+		<div id="sticky-nav-wrapper" class="sticky-top py-2">
 			<div class="container d-flex align-items-center justify-content-center position-relative">
-				
-				<!-- Mini Logo (hidden initially) -->
-				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="sticky-logo d-none position-absolute start-0 text-dark text-decoration-none fw-bold" style="font-family: var(--ff-branding); font-size: 1.5rem; letter-spacing: -1px;">
+
+				<!-- Mini Logo (hidden initially, shown on scroll) -->
+				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="sticky-logo d-none position-absolute start-0 text-white text-decoration-none fw-bold" style="font-family: var(--ff-branding); font-size: 1.5rem; letter-spacing: -1px;">
 					<?php bloginfo( 'name' ); ?>
 				</a>
 
@@ -129,19 +129,16 @@
 		<script>
 			document.addEventListener("DOMContentLoaded", function() {
 				var navWrapper = document.getElementById("sticky-nav-wrapper");
-				var stickyLogo = navWrapper.querySelector(".sticky-logo");
-				
+				var stickyLogo = navWrapper ? navWrapper.querySelector(".sticky-logo") : null;
+
 				window.addEventListener("scroll", function() {
+					if (!navWrapper) return;
 					if (window.scrollY > 150) {
-						navWrapper.classList.add("shadow-sm");
-						navWrapper.style.backgroundColor = "var(--cl-paper)";
-						navWrapper.classList.replace("bg-white", "bg-transparent");
-						stickyLogo.classList.remove("d-none");
+						navWrapper.classList.add("shadow");
+						if (stickyLogo) stickyLogo.classList.remove("d-none");
 					} else {
-						navWrapper.classList.remove("shadow-sm");
-						navWrapper.style.backgroundColor = "";
-						navWrapper.classList.replace("bg-transparent", "bg-white");
-						stickyLogo.classList.add("d-none");
+						navWrapper.classList.remove("shadow");
+						if (stickyLogo) stickyLogo.classList.add("d-none");
 					}
 				});
 			});
