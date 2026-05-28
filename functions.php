@@ -384,6 +384,15 @@ add_action( 'wp_loaded', function () {
 } );
 
 /**
+ * Set 9 posts per page on category and author archive pages.
+ */
+add_action( 'pre_get_posts', function ( $query ) {
+	if ( ! is_admin() && $query->is_main_query() && ( $query->is_category() || $query->is_author() ) ) {
+		$query->set( 'posts_per_page', 9 );
+	}
+} );
+
+/**
  * Fix: Redirect attachment pages to their parent post.
  * Prevents WordPress from resolving /%category%/%postname%/ URLs as
  * attachment/image pages instead of the actual post.
