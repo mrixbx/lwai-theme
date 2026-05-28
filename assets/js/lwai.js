@@ -12,15 +12,32 @@
 
 	/* ─── Mobile Navigation ─────────────────────────────────────────────── */
 	var siteNav    = document.getElementById( 'site-navigation' );
+	var navWrapper = document.getElementById( 'sticky-nav-wrapper' );
 	var mobileToggles = document.querySelectorAll( '.mobile-menu-toggle, .mobile-menu-toggle-sticky' );
+
+	function closeMobileNav() {
+		if ( siteNav )    siteNav.classList.remove( 'nav-open' );
+		if ( navWrapper ) navWrapper.classList.remove( 'nav-open' );
+		mobileToggles.forEach( function ( b ) { b.setAttribute( 'aria-expanded', 'false' ); } );
+	}
 
 	mobileToggles.forEach( function ( btn ) {
 		btn.addEventListener( 'click', function () {
 			if ( ! siteNav ) return;
 			var isOpen = siteNav.classList.toggle( 'nav-open' );
+			if ( navWrapper ) navWrapper.classList.toggle( 'nav-open', isOpen );
 			this.setAttribute( 'aria-expanded', isOpen ? 'true' : 'false' );
 		} );
 	} );
+
+	/* Close nav when a menu link is tapped on mobile */
+	if ( siteNav ) {
+		siteNav.querySelectorAll( 'a' ).forEach( function ( link ) {
+			link.addEventListener( 'click', function () {
+				if ( window.innerWidth <= 767 ) { closeMobileNav(); }
+			} );
+		} );
+	}
 
 	/* ─── Search Overlay ─────────────────────────────────────────────────── */
 	var searchToggle  = document.querySelector( '.search-toggle' );
