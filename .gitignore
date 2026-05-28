@@ -1,0 +1,12 @@
+# Local dev tooling
+.claude/
+*.py
+__pycache__/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+*.swp

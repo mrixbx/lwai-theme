@@ -1,0 +1,750 @@
+/*
+Theme Name: LWAI
+Theme URI: https://latestwithai.com/
+Author: LWAI Team
+Description: A lightweight, New York Times-inspired WordPress theme for AI journalism.
+Version: 1.1.0
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: lwai
+Tags: blog, news, custom-logo, translation-ready
+*/
+
+/* ==========================================================================
+   1. CSS Variables & Reset
+   ========================================================================== */
+:root {
+/* Backgrounds */
+--ft-bg-main: #FFF1E5;
+--ft-bg-card: #F2E9DF;
+--ft-bg-highlight: #E9D8C8;
+--ft-bg-dark: #1A1A1A;
+--ft-bg-white: #FFFFFF;
+
+/* Text */
+--ft-text-headline: #1A1A1A;
+--ft-text-body: #333333;
+--ft-text-muted: #66605A;
+--ft-text-inverse: #FFFFFF;
+
+/* Accents */
+--ft-teal: #0D7680;
+--ft-teal-hover: #095A62;
+--ft-crimson: #990F3D;
+--ft-border: #E8DCC8;
+
+/* Typography */
+--ff-branding: 'Playfair Display', Georgia, serif;
+--ff-heading:  'Playfair Display', Georgia, serif;
+--ff-body:     'DM Sans', Arial, sans-serif;
+--ff-ui:       'Libre Franklin', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+/* Spacing */
+--sp-xs:  4px;
+--sp-sm:  8px;
+--sp-md:  16px;
+--sp-lg:  24px;
+--sp-xl:  48px;
+--sp-xxl: 64px;
+
+--max-width: 1200px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { overflow-x: hidden; }
+
+body {
+margin: 0;
+padding: 0;
+font-family: var(--ff-body);
+line-height: 1.7;
+color: var(--ft-text-body);
+background-color: var(--ft-bg-main);
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+
+a { color: var(--ft-teal); text-decoration: none; }
+a:hover { color: var(--ft-teal-hover); text-decoration: underline; }
+
+/* ==========================================================================
+   2. Typography
+   ========================================================================== */
+h1, h2, h3, h4, h5, h6 {
+font-family: var(--ff-heading);
+margin-top: 0;
+margin-bottom: var(--sp-md);
+line-height: 1.2;
+color: var(--ft-text-headline);
+font-weight: 700;
+}
+
+/* In-article sub-section headings */
+.article-content h2 {
+font-size: 26px;
+font-family: var(--ff-heading);
+font-weight: 700;
+margin: 32px 0 12px;
+color: var(--ft-text-headline);
+}
+
+/* ==========================================================================
+   3. Layout
+   ========================================================================== */
+.site-container {
+max-width: var(--max-width);
+margin: 0 auto;
+padding: 0 var(--sp-md);
+}
+
+/* Search button */
+.search-toggle {
+cursor: pointer;
+min-height: 44px;
+min-width: 44px;
+}
+.search-toggle:hover { opacity: 0.6; }
+
+/* Search overlay */
+.search-overlay {
+position: fixed;
+inset: 0;
+background: rgba(255, 241, 229, 0.97);
+z-index: 9000;
+display: none;
+align-items: flex-start;
+padding-top: 80px;
+justify-content: center;
+}
+.search-overlay.is-open { display: flex; }
+
+.search-overlay-inner {
+position: relative;
+width: 100%;
+max-width: 600px;
+padding: 0 var(--sp-md);
+}
+
+.search-overlay input[type="search"] {
+width: 100%;
+font-size: 28px;
+border: none;
+border-bottom: 2px solid var(--ft-border);
+padding: 8px 0;
+outline: none;
+font-family: var(--ff-heading);
+background: transparent;
+}
+
+.search-close {
+position: absolute;
+top: -60px;
+right: 0;
+background: none;
+border: none;
+font-size: 32px;
+cursor: pointer;
+color: var(--ft-text-headline);
+padding: 8px;
+min-height: 44px;
+min-width: 44px;
+line-height: 1;
+}
+
+/* Site branding */
+.site-branding {
+text-align: center;
+margin: var(--sp-lg) 0;
+}
+
+.site-title {
+font-family: var(--ff-branding);
+font-size: clamp(2.5rem, 6vw, 5rem);
+font-weight: normal;
+margin: 0;
+line-height: 1;
+}
+.site-title a {
+color: var(--ft-bg-dark);
+transition: color 0.2s ease, background-color 0.2s ease;
+padding: 4px 16px;
+border-radius: 4px;
+display: inline-block;
+}
+.site-title a:hover {
+color: var(--ft-text-inverse) !important;
+background-color: var(--ft-bg-dark);
+text-decoration: none !important;
+}
+
+.custom-logo-link img { max-width: 300px; margin: 0 auto; }
+
+/* ── Navigation ── */
+
+#site-navigation a {
+font-size: 13px;
+text-transform: uppercase;
+letter-spacing: 0.08em;
+font-family: var(--ff-ui);
+font-weight: 700;
+color: var(--ft-bg-dark);
+text-decoration: none;
+transition: color 0.2s ease, background-color 0.2s ease;
+padding: 5px 10px;
+border-radius: 3px;
+display: inline-block;
+}
+#site-navigation a:hover {
+background-color: var(--ft-bg-dark);
+color: var(--ft-text-inverse) !important;
+text-decoration: none;
+}
+
+/* Mobile sticky bar (hidden on desktop) */
+.mobile-sticky-bar { display: none; }
+
+/* Mobile menu toggle (hidden on desktop) */
+.mobile-menu-toggle,
+.mobile-menu-toggle-sticky,
+.menu-toggle {
+display: none;
+background: none;
+border: none;
+font-size: 24px;
+cursor: pointer;
+padding: 8px;
+min-height: 44px;
+min-width: 44px;
+color: var(--ft-text-headline);
+}
+
+/* ==========================================================================
+   5. Kickers & Category Labels
+   ========================================================================== */
+.kicker,
+.cat-label,
+.category-label {
+font-size: 12px;
+font-family: var(--ff-ui);
+font-weight: 700;
+text-transform: uppercase;
+letter-spacing: 0.05em;
+color: var(--ft-teal);
+display: block;
+margin-bottom: 6px;
+text-decoration: none;
+}
+.kicker:hover, .cat-label:hover, .category-label:hover {
+color: var(--ft-teal);
+text-decoration: underline;
+}
+
+/* ==========================================================================
+   6. Section Titles
+   ========================================================================== */
+.section-title {
+font-size: 13px;
+letter-spacing: 0.08em;
+font-weight: 700;
+text-transform: uppercase;
+font-family: var(--ff-ui);
+border-top: 1px solid var(--ft-border);
+border-bottom: 1px solid var(--ft-border);
+padding: 8px 0 6px;
+margin-bottom: 16px;
+color: var(--ft-text-headline);
+}
+
+/* ==========================================================================
+   7. Shared Card Elements
+   ========================================================================== */
+.entry-meta {
+font-family: var(--ff-ui);
+font-size: 0.85rem;
+color: var(--ft-text-muted);
+margin-bottom: var(--sp-sm);
+}
+
+.entry-summary {
+font-size: 1.1rem;
+color: var(--ft-text-muted);
+}
+
+.card-byline {
+font-size: 12px;
+color: var(--ft-text-muted);
+font-family: var(--ff-ui);
+margin-top: 8px;
+display: block;
+}
+
+/* Tapable card overlay: full-card click target via headline link pseudo-element */
+.story-sidebar,
+.nyt-horizontal-story,
+.nyt-stacked-story,
+.nyt-split-story,
+.nyt-compact-story { position: relative; }
+
+.story-sidebar .entry-title a::after,
+.nyt-horizontal-story .entry-title a::after,
+.nyt-stacked-story .entry-title a::after,
+.nyt-split-story .entry-title a::after,
+.nyt-compact-story .entry-title a::after {
+content: '';
+position: absolute;
+inset: 0;
+z-index: 1;
+}
+
+/* ==========================================================================
+   8. Blog Index Grid (index.php)
+   ========================================================================== */
+.news-grid {
+display: grid;
+grid-template-columns: 1fr;
+gap: var(--sp-lg);
+}
+
+@media (min-width: 768px) {
+.news-grid { grid-template-columns: 2fr 1fr; }
+.news-grid-columns { border-left: 1px solid var(--ft-border); padding-left: var(--sp-lg); }
+}
+@media (min-width: 1024px) {
+.news-grid { grid-template-columns: 1fr 2fr 1fr; }
+.news-grid > div:not(:first-child) { border-left: 1px solid var(--ft-border); padding-left: var(--sp-lg); }
+}
+
+.story {
+margin-bottom: var(--sp-lg);
+padding-bottom: var(--sp-lg);
+border-bottom: 1px solid var(--ft-border);
+}
+.story:last-child { border-bottom: none; }
+.story-lead .entry-title { font-size: 2.5rem; }
+
+/* ==========================================================================
+   9. Custom Utilities & Interactive Features
+   ========================================================================== */
+
+/* Link Hover Animation */
+.hover-primary { 
+transition: color 0.25s ease-in-out, text-decoration-color 0.25s ease-in-out; 
+text-decoration-color: transparent !important;
+}
+.hover-primary:hover { 
+color: var(--ft-teal) !important; 
+text-decoration: underline !important; 
+text-decoration-color: var(--ft-teal) !important;
+text-underline-offset: 4px;
+}
+
+/* Image Hover Zoom Animation */
+article a.d-block {
+overflow: hidden;
+display: block;
+border-radius: 4px;
+}
+article a.d-block img {
+transition: transform 0.4s ease;
+}
+article a.d-block:hover img {
+transform: scale(1.05);
+}
+
+/* Bootstrap Border Extensions */
+@media (min-width: 768px) {
+.border-end-md { border-right: 1px solid var(--ft-border) !important; }
+.border-md-top-0 { border-top: 0 !important; }
+.border-md-bottom-0 { border-bottom: 0 !important; }
+}
+@media (min-width: 992px) {
+.border-end-lg { border-right: 1px solid var(--ft-border) !important; }
+}
+
+/* Sub-card spacing fixes */
+.center-sub-stories {
+margin-top: var(--sp-lg);
+}
+
+.photo-credit { display: block; text-align: right; font-size: 0.65rem; color: var(--ft-text-muted); font-family: var(--ff-ui); margin-top: 4px; }
+
+/* Section grid (blog listing variant) */
+.section-grid { display: grid; grid-template-columns: 1fr; gap: var(--sp-lg); }
+
+@media (min-width: 768px) {
+.section-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.section-grid .story { border-bottom: none; border-right: 1px solid var(--ft-border); padding-bottom: 0; padding-right: var(--sp-lg); }
+.section-grid .story:last-child { border-right: none; padding-right: 0; }
+}
+.section-grid .entry-title { font-size: 1.2rem; }
+
+/* ==========================================================================
+   11. Single Post — NYT Article Layout
+   ========================================================================== */
+.narrow-constraint { max-width: 600px; margin: 0 auto; }
+
+/* Article hero header */
+.article-hero-header {
+background: var(--ft-bg-dark);
+padding-top: var(--sp-xl);
+padding-bottom: 0;
+margin-bottom: 0;
+text-align: left;
+border-top: none;
+}
+
+/* Hero child elements on dark background */
+.article-hero-header .article-title { color: var(--ft-text-inverse); }
+.article-hero-header .article-dek { color: rgba(255, 255, 255, 0.75); }
+.article-hero-header .article-share-tools { border-top-color: rgba(255, 255, 255, 0.2); }
+.article-hero-header .share-btn {
+border-color: rgba(255, 255, 255, 0.35);
+color: var(--ft-text-inverse);
+}
+.article-hero-header .share-btn:hover { background-color: rgba(255, 255, 255, 0.12); }
+
+.article-hero-text {
+max-width: 680px;
+margin: 0 auto;
+padding: 0 var(--sp-md);
+}
+
+.article-title {
+font-family: var(--ff-heading);
+font-size: clamp(2.2rem, 5vw, 3rem);
+font-weight: 700;
+line-height: 1.1;
+color: var(--ft-text-headline);
+margin-bottom: var(--sp-md);
+}
+
+.article-dek {
+font-size: 1.25rem;
+line-height: 1.4;
+color: var(--ft-text-muted);
+font-family: var(--ff-body);
+font-weight: 400;
+margin-bottom: 24px;
+}
+
+.article-hero-meta {
+font-family: var(--ff-ui);
+margin-bottom: var(--sp-md);
+display: flex;
+align-items: center;
+gap: 12px;
+}
+
+.live-kicker {
+background-color: var(--ft-crimson);
+color: var(--ft-bg-white);
+font-weight: 700;
+padding: 2px 6px;
+font-size: 0.8rem;
+border-radius: 2px;
+letter-spacing: 0.5px;
+}
+
+.updated-time { font-size: 0.85rem; color: var(--ft-text-muted); font-weight: 600; }
+
+.article-share-tools { border-top: 1px solid var(--ft-border); padding-top: var(--sp-md); margin-bottom: var(--sp-xl); }
+
+.share-btn {
+background: none;
+border: 1px solid var(--ft-border);
+padding: 10px 16px;
+border-radius: 20px;
+font-family: var(--ff-ui);
+font-size: 0.8rem;
+color: var(--ft-text-headline);
+display: inline-flex;
+align-items: center;
+gap: 8px;
+cursor: pointer;
+font-weight: 600;
+min-height: 44px;
+transition: background 0.2s;
+}
+.share-btn:hover { background-color: var(--ft-bg-card); }
+
+.article-hero-image { max-width: 1000px; margin: 0 auto; padding: 0 var(--sp-md); padding-bottom: 0; overflow: hidden; }
+.article-hero-image .hero-img { width: auto; height: auto; display: block; margin: 0 auto; }
+.article-hero-image .media-caption,
+.media-caption { margin-top: var(--sp-sm); text-align: right; font-family: var(--ff-ui); font-size: 0.75rem; color: var(--ft-text-muted); }
+
+.article-meta-block {
+border-top: 1px solid var(--ft-border);
+border-bottom: 1px solid var(--ft-border);
+padding: var(--sp-sm) 0;
+margin-bottom: var(--sp-xl);
+display: flex;
+flex-direction: column;
+}
+
+.byline-name { font-family: var(--ff-ui); font-weight: bold; font-size: 1rem; color: var(--ft-text-headline); }
+.byline-name a { color: inherit; }
+
+.article-date {
+font-family: var(--ff-ui);
+font-size: 14px;
+color: var(--ft-text-muted);
+text-transform: none;
+margin-top: 4px;
+}
+
+.article-content {
+font-size: 1.25rem;
+line-height: 1.7;
+color: var(--ft-text-headline);
+}
+.article-content p { margin-bottom: var(--sp-lg); }
+.article-content img { max-width: 100%; height: auto; width: auto; margin: 0 auto; display: block; }
+
+/* Drop cap */
+.article-content > p:first-of-type::first-letter {
+float: left;
+font-family: var(--ff-heading);
+font-size: 4.5rem;
+line-height: 0.8;
+padding-top: 4px;
+padding-right: 8px;
+padding-left: 3px;
+color: var(--ft-text-headline);
+}
+
+/* ==========================================================================
+   11b. Author Box
+   ========================================================================== */
+.post-author-box {
+display: flex;
+align-items: flex-start;
+gap: 20px;
+padding: 32px 0;
+margin: 32px auto;
+border-top: 1px solid var(--ft-border);
+border-bottom: 1px solid var(--ft-border);
+}
+
+.post-author-box .author-avatar img {
+border-radius: 50%;
+width: 80px;
+height: 80px;
+object-fit: cover;
+}
+
+.post-author-box .author-info {
+flex: 1;
+}
+
+.post-author-box .author-name {
+margin-top: 0;
+margin-bottom: 8px;
+font-family: var(--ff-heading);
+font-size: 1.5rem;
+color: var(--ft-text-headline);
+}
+
+.post-author-box .author-name a {
+color: inherit;
+text-decoration: none;
+}
+.post-author-box .author-name a:hover {
+text-decoration: underline;
+}
+
+.post-author-box .author-bio {
+font-size: 1rem;
+line-height: 1.6;
+color: var(--ft-text-muted);
+margin: 0;
+font-family: var(--ff-body);
+}
+
+/* ==========================================================================
+   12. Post Navigation
+   ========================================================================== */
+.post-navigation { margin-top: var(--sp-xl); margin-bottom: var(--sp-xl); border-top: 2px solid var(--ft-border); padding-top: var(--sp-lg); }
+
+.nav-links { display: flex; justify-content: space-between; gap: var(--sp-lg); }
+.nav-previous, .nav-next { flex: 1; display: flex; flex-direction: column; text-decoration: none !important; }
+.nav-next { text-align: right; }
+.nav-next .nav-content { flex-direction: row-reverse; }
+
+.nav-label { font-family: var(--ff-ui); font-size: 0.8rem; font-weight: bold; text-transform: uppercase; color: var(--ft-text-muted); margin-bottom: var(--sp-sm); display: block; }
+.nav-content { display: flex; align-items: center; gap: var(--sp-md); }
+.nav-content img { width: 100px; height: 100px; object-fit: cover; }
+.nav-title { font-family: var(--ff-heading); font-size: 1.15rem; font-weight: 700; line-height: 1.3; color: var(--ft-text-headline); }
+.nav-previous:hover .nav-title, .nav-next:hover .nav-title { text-decoration: underline; }
+
+/* ==========================================================================
+   13. Related Posts
+   ========================================================================== */
+.related-posts { border-top: 2px solid var(--ft-border); padding-top: 16px; margin-top: 48px; margin-bottom: 48px; }
+.related-posts .section-title { border-top: none; padding-top: 0; }
+
+.related-post-card img { width: 100%; height: 80px; object-fit: cover; display: block; margin-bottom: 8px; }
+.related-post-card .entry-title { font-size: 1rem; line-height: 1.3; margin-bottom: 0; }
+.related-post-card .entry-title a { color: var(--ft-text-headline); }
+.related-post-card .cat-label { font-size: 11px; }
+
+/* ==========================================================================
+   14. Reading Progress Bar
+   ========================================================================== */
+#reading-progress {
+position: fixed;
+top: 0;
+left: 0;
+height: 3px;
+background: var(--ft-crimson);
+width: 0%;
+z-index: 9999;
+pointer-events: none;
+transition: width 0.1s linear;
+}
+
+/* ==========================================================================
+   15. Footer Nav
+   ========================================================================== */
+.footer-nav-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 24px; list-style: none; margin: 0; padding: 0; text-align: left; }
+.footer-nav-menu a { font-size: 13px; color: var(--ft-text-headline); text-transform: uppercase; letter-spacing: 0.05em; text-decoration: none; transition: color 0.2s ease; }
+.footer-nav-menu a:hover { color: var(--ft-teal); text-decoration: underline; text-underline-offset: 3px; }
+
+/* ==========================================================================
+   16. Back-to-Top Button
+   ========================================================================== */
+#back-to-top {
+position: fixed;
+bottom: 24px;
+right: 16px;
+width: 40px;
+height: 40px;
+background: var(--ft-bg-dark);
+color: var(--ft-bg-white);
+border: none;
+border-radius: 50%;
+font-size: 20px;
+z-index: 999;
+display: none;
+cursor: pointer;
+align-items: center;
+justify-content: center;
+}
+
+/* ==========================================================================
+   17. Single Post Containers (legacy compat)
+   ========================================================================== */
+.single-post-container { max-width: 800px; margin: 0 auto; }
+
+/* ==========================================================================
+   18. Mobile — max-width: 767px
+   ========================================================================== */
+@media (max-width: 767px) {
+
+/* ── Mobile sticky bar ── */
+.mobile-sticky-bar {
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+height: 48px;
+background: var(--ft-bg-white);
+border-bottom: 1px solid var(--ft-border);
+z-index: 1000;
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 0 16px;
+}
+.mobile-site-title {
+font-family: var(--ff-branding);
+font-size: 20px;
+font-weight: 700;
+color: var(--ft-text-headline);
+text-decoration: none;
+}
+.mobile-menu-toggle,
+.mobile-menu-toggle-sticky {
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+body { padding-top: 48px; }
+
+/* ── Desktop nav hidden, toggle-controlled ── */
+.site-navigation { display: none; border: none; padding: 0; margin-bottom: 0; }
+.site-navigation.nav-open { display: block; }
+.site-navigation.nav-open .nav-menu { flex-direction: column; gap: 0; padding: 0; border-top: 1px solid var(--ft-border); }
+.site-navigation.nav-open a { display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--ft-border); font-size: 16px; min-height: 44px; letter-spacing: 0; }
+
+/* ── Layout ── */
+.site-container { padding: 0 14px; }
+.site-header-top .header-tagline { display: none; }
+.site-branding { margin: 8px 0; }
+.site-title { font-size: clamp(2rem, 8vw, 3rem); }
+
+/* ── Homepage ── */
+.front-page-top { gap: 16px; }
+.front-col-center { order: -1; }
+.front-col-center .story-lead .entry-title { font-size: 1.8rem; text-align: left; }
+.front-section { padding-top: 16px; margin-bottom: 32px; }
+.section-title { font-size: 12px; }
+
+/* Grid fixes */
+.nyt-split-stories { grid-template-columns: 1fr; }
+.nyt-split-story:first-child { border-right: none; padding-right: 0; border-bottom: 1px solid var(--ft-border); padding-bottom: 24px; margin-bottom: 16px; }
+.nyt-compact-split { grid-template-columns: 1fr; }
+.center-sub-stories { grid-template-columns: 1fr; }
+.center-sub-stories .story-sub-lead:first-child { border-right: none; padding-right: 0; border-bottom: 1px solid var(--ft-border); padding-bottom: 24px; }
+
+/* ── Single post ── */
+.article-hero-header { padding-top: 24px; padding-bottom: 16px; }
+.article-hero-text { padding: 0; }
+.narrow-constraint { max-width: 100%; margin: 0; padding: 0; }
+.article-content { font-size: 1.1rem; }
+.article-content h2 { font-size: 22px; }
+.article-dek { font-size: 1.1rem; }
+.article-content > p:first-of-type::first-letter { font-size: 2.8rem; line-height: 0.85; padding-right: 6px; }
+.entry-summary { font-size: 1rem; }
+.story-sidebar { gap: 10px; }
+
+/* Author Box */
+.post-author-box {
+padding: 24px 0;
+margin: 24px 0;
+gap: 16px;
+}
+.post-author-box .author-avatar img {
+width: 60px;
+height: 60px;
+}
+.post-author-box .author-name {
+font-size: 1.25rem;
+}
+
+/* Post nav */
+.nav-links { flex-direction: column; gap: 16px; }
+.nav-next { text-align: left; }
+.nav-next .nav-content { flex-direction: row; }
+.nav-content img { width: 70px; height: 70px; }
+
+/* Related posts - stacks on mobile via Bootstrap row-cols */
+
+/* Touch targets */
+.share-btn { padding: 10px 16px; min-height: 44px; }
+button, a.button { min-height: 44px; display: inline-flex; align-items: center; }
+
+/* Footer */
+.footer-nav-section ul { grid-template-columns: 1fr; }
+.footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+}
+
+/* ── Desktop: hide mobile-only elements ── */
+@media (min-width: 768px) {
+.mobile-sticky-bar,
+.mobile-menu-toggle,
+.mobile-menu-toggle-sticky { display: none; }
+}
