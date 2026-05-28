@@ -485,6 +485,20 @@ function lwai_output_schema() {
 			$schema['image'] = array( '@type' => 'ImageObject', 'url' => $img_src, 'width' => 1200, 'height' => 675 );
 		}
 		echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>' . "\n";
+
+		// BreadcrumbList as JSON-LD (invisible — no visible breadcrumb UI)
+		$cats = get_the_category();
+		$crumb_items = array(
+			array( '@type' => 'ListItem', 'position' => 1, 'name' => get_bloginfo( 'name' ), 'item' => home_url( '/' ) ),
+		);
+		if ( $cats ) {
+			$crumb_items[] = array( '@type' => 'ListItem', 'position' => 2, 'name' => $cats[0]->name, 'item' => get_category_link( $cats[0]->term_id ) );
+			$crumb_items[] = array( '@type' => 'ListItem', 'position' => 3, 'name' => get_the_title() );
+		} else {
+			$crumb_items[] = array( '@type' => 'ListItem', 'position' => 2, 'name' => get_the_title() );
+		}
+		$breadcrumb = array( '@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => $crumb_items );
+		echo '<script type="application/ld+json">' . wp_json_encode( $breadcrumb, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>' . "\n";
 	}
 }
 add_action( 'wp_head', 'lwai_output_schema' );

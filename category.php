@@ -10,8 +10,6 @@ get_header();
 
 	<main id="primary" class="site-main py-4">
 
-		<?php lwai_breadcrumb(); ?>
-
 		<!-- Category Header -->
 		<header class="page-header mb-5 border-top border-bottom border-dark border-2 py-3 text-center">
 			<?php

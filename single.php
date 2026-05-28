@@ -24,8 +24,6 @@ get_header();
 				<div class="article-hero-header">
 					<div class="article-hero-text narrow-constraint">
 
-						<?php lwai_breadcrumb(); ?>
-
 						<!-- Category kicker -->
 						<?php
 						$cats = get_the_category();
