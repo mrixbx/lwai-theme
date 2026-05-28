@@ -6,19 +6,19 @@
  */
 ?>
 
-	<footer id="colophon" class="bg-light mt-5" style="font-family: var(--ff-ui);">
+	<footer id="colophon" class="mt-5" style="font-family: var(--ff-ui);">
 
 		<!-- (a) Top: centred site name -->
-		<div class="border-top py-4 text-center">
+		<div class="footer-divider py-4 text-center">
 			<p class="display-6 mb-0" style="font-family: var(--ff-branding);">
-				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="text-dark text-decoration-none hover-primary">
+				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="footer-site-name text-decoration-none">
 					<?php echo esc_html( get_bloginfo( 'name' ) ); ?>
 				</a>
 			</p>
 		</div>
 
 		<!-- (b) Middle: footer navigation grid -->
-		<div class="container py-4 border-top">
+		<div class="container py-4 footer-divider">
 			<div class="row justify-content-center">
 				<div class="col-md-10">
 					<?php
@@ -35,8 +35,8 @@
 		</div>
 
 		<!-- (c) Bottom bar: copyright + back to top -->
-		<div class="container py-3 border-top d-flex flex-column flex-md-row justify-content-between align-items-center">
-			<span class="small text-muted mb-2 mb-md-0">
+		<div class="container py-3 footer-divider d-flex flex-column flex-md-row justify-content-between align-items-center">
+			<span class="small footer-copyright mb-2 mb-md-0">
 				<?php
 				$footer_text = get_theme_mod(
 					'lwai_footer_text',
@@ -45,11 +45,11 @@
 				echo wp_kses_post( $footer_text );
 				?>
 			</span>
-			<a class="small text-dark text-decoration-none hover-primary fw-bold text-uppercase" style="letter-spacing: 0.05em;" href="#">Back to top &uarr;</a>
+			<a class="small footer-back-top fw-bold text-uppercase text-decoration-none" style="letter-spacing: 0.05em;" href="#">Back to top &uarr;</a>
 		</div>
 
 		<!-- Floating back-to-top button -->
-		<button id="back-to-top" class="btn btn-dark rounded-circle shadow-lg position-fixed" style="bottom: 24px; right: 16px; width: 44px; height: 44px; display: none; z-index: 1050; align-items: center; justify-content: center;" aria-label="<?php esc_attr_e( 'Back to top', 'lwai' ); ?>">&#8593;</button>
+		<button id="back-to-top" class="rounded-circle shadow-lg position-fixed" style="bottom: 24px; right: 16px; width: 44px; height: 44px; display: none; z-index: 1050; align-items: center; justify-content: center; border: none; cursor: pointer;" aria-label="<?php esc_attr_e( 'Back to top', 'lwai' ); ?>">&#8593;</button>
 
 	</footer><!-- #colophon -->
 

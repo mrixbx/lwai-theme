@@ -612,27 +612,58 @@ transition: width 0.1s linear;
 }
 
 /* ==========================================================================
-   15. Footer Nav
+   15. Footer
    ========================================================================== */
+#colophon {
+background-color: var(--ft-bg-dark);
+color: var(--ft-text-inverse);
+}
+
+.footer-divider { border-top: 1px solid rgba(255, 255, 255, 0.1); }
+
+.footer-site-name {
+color: var(--ft-text-inverse);
+transition: color 0.2s ease, background-color 0.2s ease;
+padding: 4px 16px;
+border-radius: 4px;
+display: inline-block;
+}
+.footer-site-name:hover {
+background-color: rgba(255, 255, 255, 0.12);
+color: var(--ft-text-inverse) !important;
+}
+
+.footer-copyright { color: rgba(255, 255, 255, 0.5); }
+
+.footer-back-top {
+color: rgba(255, 255, 255, 0.7);
+transition: color 0.2s ease;
+}
+.footer-back-top:hover { color: var(--ft-text-inverse); }
+
 .footer-nav-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 24px; list-style: none; margin: 0; padding: 0; text-align: left; }
-.footer-nav-menu a { font-size: 13px; color: var(--ft-text-headline); text-transform: uppercase; letter-spacing: 0.05em; text-decoration: none; transition: color 0.2s ease; }
-.footer-nav-menu a:hover { color: var(--ft-teal); text-decoration: underline; text-underline-offset: 3px; }
+.footer-nav-menu a { font-size: 13px; color: rgba(255, 255, 255, 0.75); text-transform: uppercase; letter-spacing: 0.05em; text-decoration: none; transition: color 0.2s ease; }
+.footer-nav-menu a:hover { color: var(--ft-text-inverse); text-decoration: underline; text-underline-offset: 3px; }
+
+#back-to-top {
+background-color: rgba(255, 255, 255, 0.15);
+color: var(--ft-text-inverse);
+transition: background-color 0.2s ease;
+}
+#back-to-top:hover { background-color: rgba(255, 255, 255, 0.28); }
 
 /* ==========================================================================
-   16. Back-to-Top Button
+   16. Back-to-Top Button (position/layout — colors defined in Footer section)
    ========================================================================== */
 #back-to-top {
 position: fixed;
 bottom: 24px;
 right: 16px;
-width: 40px;
-height: 40px;
-background: var(--ft-bg-dark);
-color: var(--ft-bg-white);
-border: none;
+width: 44px;
+height: 44px;
 border-radius: 50%;
 font-size: 20px;
-z-index: 999;
+z-index: 1050;
 display: none;
 cursor: pointer;
 align-items: center;
@@ -744,8 +775,7 @@ font-size: 1.25rem;
 button, a.button { min-height: 44px; display: inline-flex; align-items: center; }
 
 /* Footer */
-.footer-nav-section ul { grid-template-columns: 1fr; }
-.footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+.footer-nav-menu { grid-template-columns: 1fr; }
 }
 
 /* ── Desktop: hide mobile-only elements ── */
