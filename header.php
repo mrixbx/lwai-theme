@@ -106,23 +106,33 @@
 
 		<!-- Primary navigation -->
 		<div id="sticky-nav-wrapper" class="sticky-top py-2">
-			<div class="container d-flex align-items-center justify-content-center position-relative">
+			<div class="container d-flex align-items-center justify-content-between">
 
-				<!-- Mini Logo (hidden initially, shown on scroll) -->
-				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="sticky-logo d-none position-absolute start-0 text-white text-decoration-none fw-bold" style="font-family: var(--ff-branding); font-size: 1.5rem; letter-spacing: -1px;">
+				<!-- Left: Site name — hidden initially, fades in on scroll -->
+				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="sticky-logo text-white text-decoration-none fw-bold" style="font-family: var(--ff-branding); font-size: 1.5rem; letter-spacing: -1px;">
 					<?php bloginfo( 'name' ); ?>
 				</a>
 
-				<nav id="site-navigation" class="site-navigation align-items-center" aria-label="<?php esc_attr_e( 'Primary Navigation', 'lwai' ); ?>">
-					<?php
-					wp_nav_menu( array(
-						'theme_location' => 'primary',
-						'container'      => false,
-						'menu_class'     => 'nav-menu d-flex justify-content-center gap-4 flex-wrap list-unstyled m-0 text-uppercase fw-bold',
-						'fallback_cb'    => false,
-					) );
-					?>
-				</nav>
+				<!-- Right: Nav links + Search icon -->
+				<div class="d-flex align-items-center gap-3">
+					<nav id="site-navigation" class="site-navigation align-items-center" aria-label="<?php esc_attr_e( 'Primary Navigation', 'lwai' ); ?>">
+						<?php
+						wp_nav_menu( array(
+							'theme_location' => 'primary',
+							'container'      => false,
+							'menu_class'     => 'nav-menu d-flex justify-content-center gap-4 flex-wrap list-unstyled m-0 text-uppercase fw-bold',
+							'fallback_cb'    => false,
+						) );
+						?>
+					</nav>
+
+					<button class="search-toggle btn btn-link text-white p-1 rounded-circle d-none d-md-flex align-items-center" aria-label="<?php esc_attr_e( 'Search', 'lwai' ); ?>">
+						<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+							<circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2" fill="none"/>
+							<line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+						</svg>
+					</button>
+				</div>
 			</div>
 		</div>
 
@@ -133,12 +143,12 @@
 
 				window.addEventListener("scroll", function() {
 					if (!navWrapper) return;
-					if (window.scrollY > 150) {
+					if (window.scrollY > 80) {
 						navWrapper.classList.add("shadow");
-						if (stickyLogo) stickyLogo.classList.remove("d-none");
+						if (stickyLogo) stickyLogo.classList.add("is-visible");
 					} else {
 						navWrapper.classList.remove("shadow");
-						if (stickyLogo) stickyLogo.classList.add("d-none");
+						if (stickyLogo) stickyLogo.classList.remove("is-visible");
 					}
 				});
 			});

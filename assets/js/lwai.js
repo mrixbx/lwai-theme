@@ -40,15 +40,17 @@
 	}
 
 	/* ─── Search Overlay ─────────────────────────────────────────────────── */
-	var searchToggle  = document.querySelector( '.search-toggle' );
+	var searchToggles = document.querySelectorAll( '.search-toggle' );
 	var searchOverlay = document.querySelector( '.search-overlay' );
 	var searchClose   = document.querySelector( '.search-close' );
 	var searchInput   = searchOverlay ? searchOverlay.querySelector( 'input[type="search"]' ) : null;
 
-	if ( searchToggle && searchOverlay ) {
-		searchToggle.addEventListener( 'click', function () {
-			searchOverlay.classList.add( 'is-open' );
-			if ( searchInput ) { searchInput.focus(); }
+	if ( searchOverlay ) {
+		searchToggles.forEach( function ( btn ) {
+			btn.addEventListener( 'click', function () {
+				searchOverlay.classList.add( 'is-open' );
+				if ( searchInput ) { searchInput.focus(); }
+			} );
 		} );
 	}
 
