@@ -84,11 +84,6 @@ get_header();
 						<time class="article-date" datetime="<?php echo esc_attr( get_the_date( 'c' ) ); ?>">
 							Published <?php echo esc_html( get_the_date( 'M. j, Y' ) ); ?>
 						</time>
-						<?php if ( get_the_modified_date( 'c' ) !== get_the_date( 'c' ) ) : ?>
-						<time class="article-modified-date" datetime="<?php echo esc_attr( get_the_modified_date( 'c' ) ); ?>">
-							Updated <?php echo esc_html( get_the_modified_date( 'M. j, Y' ) ); ?>
-						</time>
-						<?php endif; ?>
 					</div>
 
 					<!-- Article content -->

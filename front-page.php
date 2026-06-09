@@ -105,7 +105,8 @@ get_header();
 				if ( ! $right_query->have_posts() ) {
 					$right_query = new WP_Query( array(
 						'posts_per_page'      => 5,
-						'orderby'             => 'rand',
+						'orderby'             => 'date',
+						'order'               => 'DESC',
 						'ignore_sticky_posts' => true,
 					) );
 				}

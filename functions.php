@@ -167,7 +167,6 @@ function lwai_add_toc_to_content( $content ) {
     $min_level = min( array_column( $toc_items, 'level' ) );
 
     // Build the TOC HTML
-    // Build the TOC HTML
     $toc = '<nav class="article-toc mb-5" style="border: 1px solid var(--ft-border); background-color: var(--ft-bg-card); font-family: var(--ff-ui);">';
     $toc .= '<div class="d-flex justify-content-between align-items-center p-3" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#tocCollapse" aria-expanded="true" aria-controls="tocCollapse">';
     $toc .= '<p class="mb-0 fw-bold" style="font-family: var(--ff-heading); letter-spacing: 0.5px; color: var(--ft-text-headline); font-size: 1.1rem;">Contents</p>';
@@ -319,68 +318,13 @@ function lwai_custom_avatar_url( $args, $id_or_email ) {
 add_filter( 'get_avatar_data', 'lwai_custom_avatar_url', 10, 2 );
 
 /**
- * Remove /category/ prefix from category URLs.
- *
- * Strategy: filter generated links to strip /category/, then register a specific
- * rewrite rule for every known category slug so WordPress can resolve them.
- * Flush runs on theme activation and whenever a category is created or updated.
- */
-function lwai_remove_category_base( $link ) {
-	return preg_replace( '|/category/|', '/', $link, 1 );
-}
-add_filter( 'category_link', 'lwai_remove_category_base' );
-
-function lwai_register_category_rewrites() {
-	$categories = get_categories( array( 'hide_empty' => false, 'number' => 200 ) );
-	foreach ( $categories as $cat ) {
-		$slug = preg_quote( $cat->slug, '/' );
-		add_rewrite_rule( '^' . $slug . '/page/([0-9]+)/?$', 'index.php?category_name=' . $cat->slug . '&paged=$matches[1]', 'top' );
-		add_rewrite_rule( '^' . $slug . '/?$',               'index.php?category_name=' . $cat->slug, 'top' );
-	}
-}
-add_action( 'init', 'lwai_register_category_rewrites' );
-
-function lwai_flush_category_rewrites() {
-	lwai_register_category_rewrites();
-	flush_rewrite_rules();
-}
-add_action( 'created_category', 'lwai_flush_category_rewrites' );
-add_action( 'edited_category',  'lwai_flush_category_rewrites' );
-
-/**
- * On theme activation: set permalink structure to /%category%/%postname%/
- * so article URLs become /ai-tech/article-slug/ instead of /article-slug/
+ * On theme activation: set permalink structure and category base, then flush.
+ * The category_base '.' removes /category/ from archive URLs natively.
  */
 add_action( 'after_switch_theme', function () {
 	update_option( 'permalink_structure', '/%category%/%postname%/' );
-	lwai_register_category_rewrites();
+	update_option( 'category_base', '.' );
 	flush_rewrite_rules();
-} );
-
-/**
- * Set permalink structure to /%category%/%postname%/
- * so article URLs read as /ai-tech/article-slug/ instead of /article-slug/
- *
- * Uses a versioned option so this runs once automatically even on an
- * already-active theme — no need to deactivate/reactivate.
- */
-function lwai_set_permalink_structure() {
-	if ( get_option( 'permalink_structure' ) !== '/%category%/%postname%/' ) {
-		update_option( 'permalink_structure', '/%category%/%postname%/' );
-		flush_rewrite_rules();
-	}
-}
-
-add_action( 'after_switch_theme', 'lwai_set_permalink_structure' );
-
-// One-time trigger for themes that are already active
-add_action( 'wp_loaded', function () {
-	if ( ! get_option( 'lwai2_permalink_v1' ) ) {
-		lwai_set_permalink_structure();
-		lwai_register_category_rewrites();
-		flush_rewrite_rules();
-		update_option( 'lwai2_permalink_v1', '1' );
-	}
 } );
 
 /**
@@ -391,6 +335,68 @@ add_action( 'pre_get_posts', function ( $query ) {
 		$query->set( 'posts_per_page', 9 );
 	}
 } );
+
+/**
+ * Permalink: prefer a non-"Breaking" category slug in the URL.
+ * Respects Yoast primary category when set; otherwise falls back to first
+ * non-breaking category. Only keeps "breaking" when it is the sole category.
+ */
+add_filter( 'post_link_category', function ( $cat, $cats, $post ) {
+	// Honour Yoast primary category if one is set and it is not "breaking".
+	$primary_id = (int) get_post_meta( $post->ID, '_yoast_wpseo_primary_category', true );
+	if ( $primary_id ) {
+		foreach ( $cats as $c ) {
+			if ( (int) $c->term_id === $primary_id && 'breaking' !== $c->slug ) {
+				return $c;
+			}
+		}
+	}
+
+	// Fallback: skip the "breaking" category.
+	if ( 'breaking' !== $cat->slug ) {
+		return $cat;
+	}
+	foreach ( $cats as $c ) {
+		if ( 'breaking' !== $c->slug ) {
+			return $c;
+		}
+	}
+	return $cat;
+}, 10, 3 );
+
+/**
+ * Remove the /category/ base from category archive URLs.
+ * Sets the option once and flushes rewrite rules only when the value changes,
+ * so there is no per-request overhead.
+ */
+add_action( 'init', function () {
+	if ( get_option( 'category_base' ) !== '.' ) {
+		update_option( 'category_base', '.' );
+		flush_rewrite_rules( false );
+	}
+} );
+
+/**
+ * Redirect date archives (/2025/, /2025/05/, /2025/05/29/) to homepage.
+ * Date archives are duplicate content with no editorial value on this site.
+ */
+add_action( 'template_redirect', function () {
+	if ( is_date() ) {
+		wp_redirect( home_url( '/' ), 301 );
+		exit;
+	}
+}, 1 );
+
+/**
+ * Redirect the /breaking/ category archive to the homepage.
+ * "Breaking" is used as a post label, not a browsable section.
+ */
+add_action( 'template_redirect', function () {
+	if ( is_category( 'breaking' ) ) {
+		wp_redirect( home_url( '/' ), 301 );
+		exit;
+	}
+}, 1 );
 
 /**
  * Fix: Redirect attachment pages to their parent post.
@@ -411,10 +417,53 @@ add_action( 'template_redirect', function () {
 } );
 
 /**
- * M-4: Noindex search result pages — they are thin/duplicate content.
+ * Auto-redirect slug-only or wrong-category URLs to the canonical permalink.
+ *
+ * Handles two cases:
+ *  - /article-slug/           → 301 to /correct-category/article-slug/
+ *  - /any-category/article-slug/ that 404s (e.g. old "breaking" URL after
+ *    the category was swapped) → 301 to the canonical permalink
+ *
+ * Runs on priority 5 so it fires before other template_redirect hooks.
+ */
+add_action( 'template_redirect', function () {
+	if ( ! is_404() ) {
+		return;
+	}
+
+	$path     = trim( parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ), '/' );
+	$segments = array_values( array_filter( explode( '/', $path ) ) );
+
+	if ( empty( $segments ) ) {
+		return;
+	}
+
+	// The post slug is always the last path segment.
+	$slug = sanitize_title( end( $segments ) );
+
+	if ( empty( $slug ) ) {
+		return;
+	}
+
+	$posts = get_posts( array(
+		'name'           => $slug,
+		'post_type'      => 'post',
+		'post_status'    => 'publish',
+		'posts_per_page' => 1,
+		'no_found_rows'  => true,
+	) );
+
+	if ( ! empty( $posts ) ) {
+		wp_redirect( get_permalink( $posts[0]->ID ), 301 );
+		exit;
+	}
+}, 5 );
+
+/**
+ * Noindex thin/duplicate archive pages: search, tags, and date archives.
  */
 add_action( 'wp_head', function () {
-	if ( is_search() ) {
+	if ( is_search() || is_tag() || is_date() ) {
 		echo '<meta name="robots" content="noindex, follow">' . "\n";
 	}
 } );
@@ -429,12 +478,183 @@ add_filter( 'wp_sitemaps_post_types', function ( $post_types ) {
 } );
 
 /**
- * C-7: robots.txt additions — block search results and attachments.
+ * robots.txt: block thin content + explicitly allow AI search crawlers.
+ * Each crawler gets its own group so their Allow overrides any wildcard block.
  */
 add_filter( 'robots_txt', function ( $output, $public ) {
-	$output .= "\nDisallow: /?s=\nDisallow: /attachment/\n";
+	// Thin/duplicate paths — applied to all crawlers via the wildcard group
+	$output .= "\nDisallow: /?s=\nDisallow: /attachment/\nDisallow: /tag/\nDisallow: /20\n";
+
+	// Reference the news sitemap so Google News picks it up automatically
+	$output .= "\nSitemap: " . home_url( '/news-sitemap.xml' ) . "\n";
+
+	// Explicitly allow AI search engine crawlers (they respect robots.txt)
+	$ai_bots = array(
+		'GPTBot',           // ChatGPT / OpenAI
+		'Google-Extended',  // Gemini / Google AI
+		'PerplexityBot',    // Perplexity AI
+		'anthropic-ai',     // Claude web index
+		'ClaudeBot',        // Claude
+		'Applebot-Extended',// Apple Intelligence
+		'Meta-ExternalAgent',// Meta AI
+		'cohere-ai',        // Cohere
+		'YouBot',           // You.com
+	);
+	foreach ( $ai_bots as $bot ) {
+		$output .= "\nUser-agent: {$bot}\nAllow: /\n";
+	}
+
 	return $output;
 }, 10, 2 );
+
+// ============================================================
+// AI & NEWS SEARCH ENGINE INTEGRATION
+// ============================================================
+
+/**
+ * IndexNow key — used to verify site ownership with Bing / Yandex / others.
+ * The key is served at /{LWAI_INDEXNOW_KEY}.txt and referenced in pings.
+ */
+define( 'LWAI_INDEXNOW_KEY', 'lwai7e8912ab3cd45f01a7f3d8e2b1c940' );
+
+/**
+ * Register URL endpoints for: Google News sitemap, IndexNow key, llms.txt.
+ */
+add_action( 'init', function () {
+	add_rewrite_rule( '^news-sitemap\.xml$',                    'index.php?lwai_news_sitemap=1', 'top' );
+	add_rewrite_rule( '^' . LWAI_INDEXNOW_KEY . '\.txt$',      'index.php?lwai_indexnow_key=1', 'top' );
+	add_rewrite_rule( '^llms\.txt$',                            'index.php?lwai_llms_txt=1',     'top' );
+} );
+
+add_filter( 'query_vars', function ( $vars ) {
+	$vars[] = 'lwai_news_sitemap';
+	$vars[] = 'lwai_indexnow_key';
+	$vars[] = 'lwai_llms_txt';
+	return $vars;
+} );
+
+/**
+ * Serve news-sitemap.xml, IndexNow key file, and llms.txt.
+ */
+add_action( 'template_redirect', function () {
+	if ( get_query_var( 'lwai_news_sitemap' ) ) {
+		lwai_serve_news_sitemap();
+	}
+	if ( get_query_var( 'lwai_indexnow_key' ) ) {
+		header( 'Content-Type: text/plain; charset=UTF-8' );
+		echo LWAI_INDEXNOW_KEY;
+		exit;
+	}
+	if ( get_query_var( 'lwai_llms_txt' ) ) {
+		lwai_serve_llms_txt();
+	}
+}, 1 );
+
+/**
+ * Generate and stream the Google News sitemap.
+ * Covers posts from the last 7 days (Google News focuses on recent content).
+ */
+function lwai_serve_news_sitemap() {
+	header( 'Content-Type: application/xml; charset=UTF-8' );
+	header( 'X-Robots-Tag: noindex' );
+
+	$posts = get_posts( array(
+		'posts_per_page' => 1000,
+		'post_status'    => 'publish',
+		'orderby'        => 'date',
+		'order'          => 'DESC',
+		'date_query'     => array( array( 'after' => '7 days ago' ) ),
+		'no_found_rows'  => true,
+	) );
+
+	$pub_name = get_bloginfo( 'name' );
+
+	echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+	echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"' . "\n";
+	echo '        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">' . "\n";
+
+	foreach ( $posts as $post ) {
+		echo "\t<url>\n";
+		echo "\t\t<loc>" . esc_url( get_permalink( $post->ID ) ) . "</loc>\n";
+		echo "\t\t<news:news>\n";
+		echo "\t\t\t<news:publication>\n";
+		echo "\t\t\t\t<news:name>" . esc_html( $pub_name ) . "</news:name>\n";
+		echo "\t\t\t\t<news:language>en</news:language>\n";
+		echo "\t\t\t</news:publication>\n";
+		echo "\t\t\t<news:publication_date>" . esc_html( get_the_date( 'c', $post->ID ) ) . "</news:publication_date>\n";
+		echo "\t\t\t<news:title>" . esc_html( get_the_title( $post->ID ) ) . "</news:title>\n";
+		echo "\t\t</news:news>\n";
+		echo "\t</url>\n";
+	}
+
+	echo '</urlset>';
+	exit;
+}
+
+/**
+ * Generate and stream llms.txt — a plain-text site description for AI systems.
+ * Spec: https://llmstxt.org
+ */
+function lwai_serve_llms_txt() {
+	header( 'Content-Type: text/plain; charset=UTF-8' );
+
+	$name = get_bloginfo( 'name' );
+	$desc = get_bloginfo( 'description' );
+	$url  = trailingslashit( home_url() );
+	$cats = get_categories( array( 'hide_empty' => true, 'number' => 20, 'orderby' => 'count', 'order' => 'DESC' ) );
+
+	$out  = "# {$name}\n\n";
+	$out .= "> {$desc}\n\n";
+	$out .= "{$name} is an AI journalism publication covering artificial intelligence news, analysis, ";
+	$out .= "research, and business insights. Content is written by journalists and editors.\n\n";
+	$out .= "## Sections\n\n";
+	foreach ( $cats as $cat ) {
+		$out .= "- [{$cat->name}](" . get_category_link( $cat->term_id ) . "): {$cat->description}\n";
+	}
+	$out .= "\n## Feeds & Discovery\n\n";
+	$out .= "- [RSS Feed]({$url}feed/)\n";
+	$out .= "- [News Sitemap]({$url}news-sitemap.xml)\n";
+	$out .= "- [Full Sitemap]({$url}wp-sitemap.xml)\n\n";
+	$out .= "## Usage\n\n";
+	$out .= "Content may be indexed and cited by AI systems. ";
+	$out .= "Attribution to {$name} ({$url}) is appreciated.\n";
+
+	echo $out;
+	exit;
+}
+
+/**
+ * Reference the Google News sitemap in WordPress's built-in sitemap index.
+ */
+add_filter( 'wp_sitemaps_index_entry', function ( $sitemap_url, $provider_name ) {
+	return $sitemap_url;
+}, 10, 2 );
+
+/**
+ * Ping IndexNow (Bing hub) the moment a post is published.
+ * Bing distributes the ping to Yandex, Seznam.cz, and other IndexNow partners.
+ * Non-blocking — runs in the background, does not slow down post saving.
+ */
+add_action( 'publish_post', function ( $post_id ) {
+	$url = get_permalink( $post_id );
+	if ( ! $url ) {
+		return;
+	}
+
+	$key      = LWAI_INDEXNOW_KEY;
+	$key_url  = home_url( "/{$key}.txt" );
+	$ping_url = add_query_arg( array(
+		'url'         => rawurlencode( $url ),
+		'key'         => $key,
+		'keyLocation' => rawurlencode( $key_url ),
+	), 'https://api.indexnow.org/indexnow' );
+
+	wp_remote_get( $ping_url, array(
+		'timeout'  => 3,
+		'blocking' => false,
+		'headers'  => array( 'User-Agent' => 'LWAI WordPress Theme/1.0' ),
+	) );
+}, 10, 1 );
 
 /**
  * C-1: Output JSON-LD structured data via wp_head.
@@ -512,46 +732,3 @@ function lwai_output_schema() {
 }
 add_action( 'wp_head', 'lwai_output_schema' );
 
-/**
- * H-1: Breadcrumb navigation helper.
- * Outputs semantic <nav> with BreadcrumbList microdata (schema.org).
- * Call lwai_breadcrumb() at the top of single.php and category.php.
- */
-function lwai_breadcrumb() {
-	if ( is_front_page() ) {
-		return;
-	}
-
-	$crumbs = array(
-		array( 'url' => home_url( '/' ), 'name' => get_bloginfo( 'name' ) ),
-	);
-
-	if ( is_singular() ) {
-		$cats = get_the_category();
-		if ( $cats ) {
-			$crumbs[] = array( 'url' => get_category_link( $cats[0]->term_id ), 'name' => $cats[0]->name );
-		}
-		$crumbs[] = array( 'url' => '', 'name' => get_the_title() );
-	} elseif ( is_category() ) {
-		$crumbs[] = array( 'url' => '', 'name' => single_cat_title( '', false ) );
-	} elseif ( is_author() ) {
-		$crumbs[] = array( 'url' => '', 'name' => get_the_author_meta( 'display_name', get_queried_object_id() ) );
-	}
-
-	echo '<nav class="lwai-breadcrumb" aria-label="' . esc_attr__( 'Breadcrumb', 'lwai' ) . '">';
-	echo '<ol itemscope itemtype="https://schema.org/BreadcrumbList">';
-	$total = count( $crumbs );
-	foreach ( $crumbs as $i => $crumb ) {
-		$is_last = ( $i === $total - 1 );
-		echo '<li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">';
-		if ( ! $is_last && $crumb['url'] ) {
-			echo '<a itemprop="item" href="' . esc_url( $crumb['url'] ) . '"><span itemprop="name">' . esc_html( $crumb['name'] ) . '</span></a>';
-			echo '<span class="lwai-breadcrumb-sep" aria-hidden="true">&rsaquo;</span>';
-		} else {
-			echo '<span itemprop="name">' . esc_html( $crumb['name'] ) . '</span>';
-		}
-		echo '<meta itemprop="position" content="' . ( $i + 1 ) . '">';
-		echo '</li>';
-	}
-	echo '</ol></nav>';
-}
